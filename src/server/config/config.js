@@ -1,26 +1,26 @@
 require('dotenv').config();
 
-const {database, username, password } = process.env;
+const {database, username, password, host} = process.env;
 const config = {
   "development": {
     "username": username,
     "password": password,
     "database": database,
-    "host": "localhost",
+    "host": host,
     "dialect": "postgres"
   },
   "test": {
     "username": username,
     "password": password,
     "database": database,
-    "host": "localhost",
+    "host": host,
     "dialect": "postgres"
   },
   "production": {
     "username": username,
     "password": password,
     "database": database,
-    "host": "localhost",
+    "host": host,
     "dialect": "postgres"
   }
 }
