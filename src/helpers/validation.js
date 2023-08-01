@@ -30,7 +30,7 @@ export const acceptedPhoneNumber = async (phone) => {
   } else if(Number(phone_type) === 0 && phone?.length != 11){
     throw new Error("Wrong phone number type. Tips: 08011111111");
   } else if (phone_type !== `+` && phone_type != 0){
-    throw new Error("Please provide a valid Phone Number");
+    throw new Error("Invalid Phone Number");
   }
   return true;
 }
@@ -39,10 +39,10 @@ export const formatPhoneNumber = async (phone) => {
   return `0${ phone?.slice(-10) }`;
 }
 
-export const updateExistingPhone = async (phone, { req }) => {
+export const updateExistingPhone = async (phone,  guest_id) => {
   const verify_user_existing_phone = await Model.Guest.findOne({ where: { phone } });
   if(verify_user_existing_phone){
-    if(verify_user_existing_phone.id === Number(req.params.guest_id)){
+    if(verify_user_existing_phone.id === Number(guest_id)){
       return true;
     } else {
       throw new Error("Phone Number already exist");
@@ -59,7 +59,7 @@ export const verifyGuest = async (body, { req }) => {
   }
   await updateExistingEmail(body.email, { req });
   await acceptedPhoneNumber(body.phone);
-  await updateExistingPhone(body.phone, { req });
+  await updateExistingPhone(body.phone, guest_id);
   
   // return true;
 }
