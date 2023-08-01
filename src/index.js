@@ -19,6 +19,10 @@ app.get("/", (req, res) => {
   responseHandler(res, 200, true, "Backend Successfully connected");
 });
 
+app.use("*", (req, res) => {
+  responseHandler(res, 404, true, "Invalid Route.");
+});
+
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
