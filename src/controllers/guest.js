@@ -22,3 +22,14 @@ export const updateGuest = async(req, res) => {
         return responseHandler(res, 500, false, "Something went wrong, try again later");
     }
 }
+
+export const deleteGuest = async(req, res) => {
+    const id = req.params.guest_id;
+    try {
+        await Model.Guest.destroy({ where: {id} });
+        responseHandler(res, 200, true, "Guest Deleted Successfully");
+    } catch (error) {
+        await errorHandler(error);
+        return responseHandler(res, 500, false, "Something went wrong, try again later");
+    }
+}

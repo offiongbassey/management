@@ -64,6 +64,14 @@ export const verifyGuest = async (body, { req }) => {
   // return true;
 }
 
+export const confirmGuest = async (id) => {
+  const confirm_guest_existence = await Model.Guest.findOne({ where: { id } });
+  if(confirm_guest_existence){
+    return true
+  }
+  throw new Error("Invalid Guest ID");
+}
+
 export const titleCase = async (name) => {
   return name?.toLowerCase()?.split(' ').map(function (text) {
     return (text?.charAt(0).toUpperCase() + text?.slice(1));
