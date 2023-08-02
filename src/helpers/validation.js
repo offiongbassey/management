@@ -60,16 +60,6 @@ export const verifyGuest = async (body, { req }) => {
   await updateExistingEmail(body.email, { req });
   await acceptedPhoneNumber(body.phone);
   await updateExistingPhone(body.phone, guest_id);
-  
-  // return true;
-}
-
-export const confirmGuest = async (id) => {
-  const confirm_guest_existence = await Model.Guest.findOne({ where: { id } });
-  if(confirm_guest_existence){
-    return true
-  }
-  throw new Error("Invalid Guest ID");
 }
 
 export const titleCase = async (name) => {

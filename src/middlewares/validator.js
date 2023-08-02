@@ -94,5 +94,4 @@ export const delete_guest_validator = [
         .withMessage("Guest Id is a number")
         .notEmpty()
         .withMessage('Guest Id cannot be empty')
-        .custom(confirmGuest)
 ]
