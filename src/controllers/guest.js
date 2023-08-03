@@ -2,23 +2,97 @@ import Model from "../server/models";
 import { responseHandler } from "../helpers/responseHandler";
 import { errorHandler } from "../helpers/errorHandler";
 
-export const createGuest = async(req, res) => {
-    try {
-        const newGuest = await Model.Guest.create(req.body);
-        responseHandler(res, 201, true, "Guest Information successfully saved", newGuest);
-    } catch (error) {
-        await errorHandler(error);
-        return responseHandler(res, 500, false, "Something went wrong, try again later");
-    }
-}
+const Op = Model.Sequelize.Op;
 
-export const updateGuest = async(req, res) => {
+export const createGuest = async (req, res) => {
+  try {
+    const guest = await Model.Guest.create(req.body);
+    await Model.Log.create({
+      guest_id: guest.id,
+      description: "created",
+      note: "Guest Created",
+      payload: req.body,
+    });
+    return responseHandler(
+      res,
+      201,
+      true,
+      "Guest Information successfully saved",
+      guest
+    );
+  } catch (error) {
+    await errorHandler(error);
+    return responseHandler(
+      res,
+      500,
+      false,
+      "Something went wrong, try again later"
+    );
+  }
+};
+
+export const updateGuest = async (req, res) => {
+  try {
     const id = req.params.guest_id;
-    try {
-        const updated_guest = await Model.Guest.update(req.body, { where: { id }, returning: true });
-        responseHandler(res, 200, true, "Guest Successfully Updated", updated_guest);
-    } catch (error) {
-        await errorHandler(error);
-        return responseHandler(res, 500, false, "Something went wrong, try again later");
+    const guest = await Model.Guest.findByPk(id);
+    if (!guest || guest.status === "deleted") {
+      return responseHandler(res, 404, false, "Guest not found");
     }
-}
+
+    const updated_guest = await Model.Guest.update(req.body, {
+      where: { id },
+      returning: true,
+    });
+    await Model.Log.create({
+      guest_id: id,
+      description: "edited",
+      note: "Guest Updated",
+      payload: req.body,
+    });
+    return responseHandler(
+      res,
+      200,
+      true,
+      "Guest Successfully Updated",
+      updated_guest
+    );
+  } catch (error) {
+    await errorHandler(error);
+    return responseHandler(
+      res,
+      500,
+      false,
+      "Something went wrong, try again later"
+    );
+  }
+};
+
+export const deleteGuest = async (req, res) => {
+  try {
+    const id = req.params.guest_id;
+    const guest = await Model.Guest.findByPk(id);
+    if (!guest) {
+      return responseHandler(res, 404, false, "Guest not found");
+    }
+    if (guest.status === "deleted") {
+      return responseHandler(res, 400, false, "Guest already deleted");
+    }
+
+    await Model.Guest.update({ status: "deleted" }, { where: { id } });
+    await Model.Log.create({
+      guest_id: id,
+      description: "deleted",
+      note: "Guest Deleted",
+      payload: guest,
+    });
+    return responseHandler(res, 200, true, "Guest Deleted Successfully");
+  } catch (error) {
+    await errorHandler(error);
+    return responseHandler(
+      res,
+      500,
+      false,
+      "Something went wrong, try again later"
+    );
+  }
+};
