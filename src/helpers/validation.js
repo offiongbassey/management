@@ -60,8 +60,6 @@ export const verifyGuest = async (body, { req }) => {
   await updateExistingEmail(body.email, { req });
   await acceptedPhoneNumber(body.phone);
   await updateExistingPhone(body.phone, guest_id);
-  
-  // return true;
 }
 
 export const titleCase = async (name) => {
