@@ -2,6 +2,8 @@ import Model from "../server/models";
 import { responseHandler } from "../helpers/responseHandler";
 import { errorHandler } from "../helpers/errorHandler";
 
+const Op = Model.Sequelize.Op;
+
 export const createGuest = async(req, res) => {
     const description = "Creating of guest";
     const note = "Guest Created";
@@ -71,3 +73,53 @@ export const deleteGuest = async(req, res) => {
         return responseHandler(res, 500, false, "Something went wrong, try again later");
     }
 }
+export const getGuestById = async (req, res) => {
+    try {
+      const guest = await Model.Guest.findByPk(req.params.guest_id);
+      if (!guest) {
+        return responseHandler(res, 404, false, "Guest not found");
+      }
+  
+      return responseHandler(res, 200, true, "Guest retrived", guest);
+    } catch (error) {
+      await errorHandler(error);
+      return responseHandler(
+        res,
+        500,
+        false,
+        "Something went wrong, try again later"
+      );
+    }
+  };
+  
+  export const getGuests = async (req, res) => {
+    try {
+      const { query: { gender, name, email, phone }} = req;
+      const where = {}
+      if (gender) {
+          where.gender = gender
+      }
+  
+      if(name) {
+          where.name = { [Op.iLike]: `%${name}%` }
+      }
+  
+      if(email){
+          where.email = email 
+      }
+  
+      if(phone){
+          where.phone = phone 
+      }
+      
+      const guests = await Model.Guest.findAll({ where });
+      if (!guests) {
+        return responseHandler(res, 404, false, "Guest not available");
+      }
+      
+      return responseHandler(res, 200, true, "Guests retrived", guests);
+    } catch (error) {
+      await errorHandler(error);
+      return responseHandler(res, 500, false, "Something went wrong, try again later");
+    }
+  };
