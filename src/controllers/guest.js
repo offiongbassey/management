@@ -2,8 +2,6 @@ import Model from "../server/models";
 import { responseHandler } from "../helpers/responseHandler";
 import { errorHandler } from "../helpers/errorHandler";
 
-const Op = Model.Sequelize.Op;
-
 export const createGuest = async (req, res) => {
   try {
     const guest = await Model.Guest.create(req.body);
@@ -13,21 +11,10 @@ export const createGuest = async (req, res) => {
       note: "Guest Created",
       payload: req.body,
     });
-    return responseHandler(
-      res,
-      201,
-      true,
-      "Guest Information successfully saved",
-      guest
-    );
+    return responseHandler(res, 201, true, "Guest Information successfully saved", guest);
   } catch (error) {
     await errorHandler(error);
-    return responseHandler(
-      res,
-      500,
-      false,
-      "Something went wrong, try again later"
-    );
+    return responseHandler(res, 500, false, "Something went wrong, try again later");
   }
 };
 
@@ -49,21 +36,10 @@ export const updateGuest = async (req, res) => {
       note: "Guest Updated",
       payload: req.body,
     });
-    return responseHandler(
-      res,
-      200,
-      true,
-      "Guest Successfully Updated",
-      updated_guest
-    );
+    return responseHandler(res, 200, true, "Guest Successfully Updated", updated_guest);
   } catch (error) {
     await errorHandler(error);
-    return responseHandler(
-      res,
-      500,
-      false,
-      "Something went wrong, try again later"
-    );
+    return responseHandler(res, 500, false, "Something went wrong, try again later");
   }
 };
 
@@ -88,11 +64,6 @@ export const deleteGuest = async (req, res) => {
     return responseHandler(res, 200, true, "Guest Deleted Successfully");
   } catch (error) {
     await errorHandler(error);
-    return responseHandler(
-      res,
-      500,
-      false,
-      "Something went wrong, try again later"
-    );
+    return responseHandler(res, 500, false, "Something went wrong, try again later");
   }
 };

@@ -91,7 +91,7 @@ export const delete_guest_validator = [
         .exists()
         .withMessage("Guest Id is required")
         .isInt()
-        .withMessage("Guest Id is a number")
+        .withMessage("Guest Id must be number")
         .notEmpty()
         .withMessage('Guest Id cannot be empty'),
     param()
