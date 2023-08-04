@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { existingEmail, existingPhone, checkAllowedFields, verifyGuest, acceptedPhoneNumber, titleCase, formatPhoneNumber } from "../helpers/validation";
 
 export const guest_validator = [
@@ -84,5 +84,69 @@ export const guest_update_validator = [
     body()
         .custom(verifyGuest)
         .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender'] ))
-    
+]
+
+export const delete_guest_validator = [
+    param('guest_id')
+        .exists()
+        .withMessage("Guest Id is required")
+        .isInt()
+        .withMessage("Guest Id must be number")
+        .notEmpty()
+        .withMessage('Guest Id cannot be empty'),
+    param()
+        .custom(param => checkAllowedFields(param, 'guest_id')),    
+]
+
+
+export const view_guest_validator = [
+    param('guest_id')
+        .exists()
+        .withMessage('Guest Id is required')
+        .isInt()
+        .withMessage("Guest Id is a number")
+        .notEmpty()
+        .withMessage("Guest Id cannot be empty"),
+    param()
+        .custom(param => checkAllowedFields(param, 'guest_id')),    
+]
+
+export const search_guests_validator = [
+    query("gender")
+        .optional()
+        .isString()
+        .withMessage("Gender is a string")
+        .notEmpty()
+        .withMessage('Gender cannot be empty')
+        .isIn(['male', 'female'])
+        .withMessage('Gender must be male or female'),
+    query("name")
+        .optional()
+        .isString()
+        .withMessage("Name is a string")
+        .notEmpty()
+        .withMessage("Name cannot be empty"),
+    query("email")
+        .optional()
+        .notEmpty()
+        .withMessage("Email cannot be empty")
+        .isEmail()
+        .withMessage("Email is not valid"),
+    query("phone")
+        .optional()
+        .isInt()
+        .withMessage("Phone is a number")
+        .notEmpty()
+        .withMessage("Phone Number cannot be empty"),
+    query('status')
+        .optional()
+        .isString()
+        .withMessage("Status is a string")
+        .notEmpty()
+        .withMessage("Status cannot be empty")
+        .isIn(['active', 'deleted', 'blocked'])
+        .withMessage("Wrong value passed. Allowed values: active, deleted, blocked"),
+    query()
+        .custom(query => checkAllowedFields(query, ['gender', 'name', 'email', 'phone', 'status']))
+
 ]
