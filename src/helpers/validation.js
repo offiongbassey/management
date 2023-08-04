@@ -109,4 +109,3 @@ export const validationHandler = (values = []) => {
     responseHandler(res, 422, false, { errors: errors.array() });
   };
 };
-
