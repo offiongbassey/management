@@ -116,3 +116,18 @@ export const getGuestById = async (req, res) => {
       return responseHandler(res, 500, false, "Something went wrong, try again later");
     }
   };
+
+  export const createMultipleUsers = async(req, res) => {
+    try {
+      
+      for(let count = 0; count < req.body.length; count++){
+        const guest = req.body[count];
+        await Model.Guest.create(guest);
+      }
+
+    return responseHandler(res, 201, true, "Guests Information successfully saved.");
+    } catch (error) {
+        await errorHandler(error);
+        return responseHandler(res, 500, false, "Something went wrong, try again later");
+    }
+  }

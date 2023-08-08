@@ -150,3 +150,43 @@ export const search_guests_validator = [
         .custom(query => checkAllowedFields(query, ['gender', 'name', 'email', 'phone', 'status']))
 
 ]
+
+export const multiple_guests_validator = [
+    body()
+        .isArray()
+        .withMessage("Guests must be an array"),
+    body('*.name')
+        .exists()
+        .withMessage("Name is required")
+        .notEmpty()
+        .withMessage("Name cannot be empty")
+        .trim()
+        .customSanitizer(titleCase),
+    body('*.email')
+        .exists()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Email is not valid")
+        .custom(existingEmail)
+        .normalizeEmail(),
+    body('*.phone')
+        .exists()
+        .withMessage("Phone Number is required")
+        .notEmpty()
+        .withMessage("Phone Number cannot be empty")
+        .isLength({ min: 11, max: 14 })
+        .withMessage("Provide a valid Phone Number")
+        .custom(acceptedPhoneNumber)
+        .custom(existingPhone)
+        .trim()
+        .customSanitizer(formatPhoneNumber),
+    body('*.gender')
+        .exists()
+        .withMessage("Gender is required")
+        .notEmpty()
+        .withMessage("Gender cannot be empty")
+        .isIn(['male', 'female'])
+        .withMessage('Gender must be male or female'),
+    body('*')
+    .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
+]
