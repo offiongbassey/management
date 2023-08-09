@@ -1,5 +1,5 @@
 import { body, param, query } from "express-validator";
-import { existingEmail, existingPhone, checkAllowedFields, verifyGuest, acceptedPhoneNumber, titleCase, formatPhoneNumber } from "../helpers/validation";
+import { existingEmail, existingPhone, checkAllowedFields, verifyGuest, acceptedPhoneNumber, titleCase, formatPhoneNumber, existingUsername, authExistingEmail, authExistingPhone, confirmPassword } from "../helpers/validation";
 
 export const guest_validator = [
     body('name')
@@ -189,4 +189,61 @@ export const multiple_guests_validator = [
         .withMessage('Gender must be male or female'),
     body('*')
     .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
+]
+
+
+export const account_creation_validator = [
+    body('name')
+        .exists()
+        .withMessage("Name is required")
+        .notEmpty()
+        .withMessage("Name cannot be empty")
+        .trim()
+        .customSanitizer(titleCase),
+    body('username')
+        .exists()
+        .withMessage("Username is required")
+        .notEmpty()
+        .withMessage("Username cannot be empty")
+        .custom(existingUsername),
+    body('email')
+        .exists()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Email is not valid")
+        .custom(authExistingEmail)
+        .normalizeEmail(),
+    body('phone')
+        .exists()
+        .withMessage("Phone Number is required")
+        .notEmpty()
+        .withMessage("Phone Number cannot be empty")
+        .isLength({ min: 11, max:14 })
+        .withMessage("Provide a valid Phone Number")
+        .custom(acceptedPhoneNumber)
+        .custom(authExistingPhone)
+        .trim()
+        .customSanitizer(formatPhoneNumber),
+    body("gender")
+        .exists()
+        .withMessage("Gender is required")
+        .notEmpty()
+        .withMessage("Gender cannot be empty")
+        .isIn(['male', 'female'])
+        .withMessage("Gender must be male or female"),
+    body("password")
+        .exists()
+        .withMessage("Password is required")
+        .isLength({ min: 7 })
+        .withMessage("Password must not be less than 7 digits"),
+    body("confirm_password")
+        .exists()
+        .withMessage("Confirm Password cannot be empty")
+        .isLength({ min: 7 })
+        .withMessage("Confirm Password must not be less than 7 digits"),
+    body()
+        .custom(confirmPassword),
+    body()
+        .custom(body => checkAllowedFields(body, ['name', 'username', 'email', 'phone', 'gender', 'role', 'status', 'password', 'confirm_password']))
+    
 ]

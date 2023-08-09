@@ -109,3 +109,37 @@ export const validationHandler = (values = []) => {
     responseHandler(res, 422, false, { errors: errors.array() });
   };
 };
+
+
+export const existingUsername = async (username) => {
+  const verify_username = await Model.User.findOne({ where: { username } });
+
+    if(verify_username){
+      throw new Error("Username already exist");
+    }
+    return true
+}
+
+export const authExistingEmail = async (email) => {
+  const verify_email = await Model.User.findOne({ where: { email } });
+  if(verify_email){
+    throw new Error("Email already exist");
+  }
+  
+  return true;
+}
+
+export const authExistingPhone = async (phone) => {
+  const verify_phone = await Model.User.findOne({ where: { phone } });
+  if(verify_phone){
+    throw new Error("Phone Number Already Exist");
+  }
+  return true;
+}
+
+export const confirmPassword = async (body) => {
+  if(body.password !== body.confirm_password){
+    throw new Error("Passwords do not match")
+  }
+    return true;
+}
