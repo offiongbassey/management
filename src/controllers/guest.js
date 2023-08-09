@@ -23,8 +23,8 @@ export const createGuest = async (req, res) => {
 export const updateGuest = async (req, res) => {
   try {
     const id = req.params.guest_id;
-    const guest = await Model.Guest.findByPk(id);
-    if (!guest || guest.status === "deleted") {
+    const guest = await Model.Guest.findOne({ where: { id, status: { [Op.ne]: 'deleted' } } });
+    if (!guest) {
       return responseHandler(res, 404, false, "Guest not found");
     }
 
@@ -48,14 +48,11 @@ export const updateGuest = async (req, res) => {
 export const deleteGuest = async (req, res) => {
   try {
     const id = req.params.guest_id;
-    const guest = await Model.Guest.findByPk(id);
+    const guest = await Model.Guest.findOne({ where: {id, status: { [Op.ne]: 'deleted'} } });
     if (!guest) {
       return responseHandler(res, 404, false, "Guest not found");
     }
-    if (guest.status === "deleted") {
-      return responseHandler(res, 400, false, "Guest already deleted");
-    }
-
+    
     await Model.Guest.update({ status: "deleted" }, { where: { id } });
     await Model.Log.create({
       guest_id: id,
@@ -73,7 +70,7 @@ export const deleteGuest = async (req, res) => {
 
 export const getGuestById = async (req, res) => {
     try {
-      const guest = await Model.Guest.findByPk(req.params.guest_id);
+      const guest = await Model.Guest.findOne({ where: { id: req.params.guest_id, status: { [Op.ne]: 'deleted' } } });
       if (!guest) {
         return responseHandler(res, 404, false, "Guest not found");
       }
@@ -106,8 +103,8 @@ export const getGuestById = async (req, res) => {
       }
       
       const guests = await Model.Guest.findAll({ where });
-      if (!guests || guests?.length < 1) {
-        return responseHandler(res, 404, false, "Guest not available");
+      if (guests?.length < 1) {
+        return responseHandler(res, 404, false, "Guest not found");
       }
       
       return responseHandler(res, 200, true, "Guests retrived", guests);

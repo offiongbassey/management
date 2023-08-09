@@ -43,7 +43,7 @@ export const guest_update_validator = [
         .exists()
         .withMessage("Guest Id is required")
         .isInt()
-        .withMessage("Guest Id is a number")
+        .withMessage("Guest Id must be number")
         .notEmpty()
         .withMessage('Guest Id cannot be empty'),
     body('name')
@@ -67,7 +67,7 @@ export const guest_update_validator = [
         .withMessage("Phone Number is required")
         .notEmpty()
         .withMessage("Phone Number cannot be empty")
-        .isLength({ min: 11 })
+        .isLength({ min: 11, max: 14 })
         .withMessage("Phone Number is invalid")
         .trim()
         .customSanitizer(formatPhoneNumber),
@@ -104,7 +104,7 @@ export const view_guest_validator = [
         .exists()
         .withMessage('Guest Id is required')
         .isInt()
-        .withMessage("Guest Id is a number")
+        .withMessage("Guest Id must be number")
         .notEmpty()
         .withMessage("Guest Id cannot be empty"),
     param()
@@ -115,7 +115,7 @@ export const search_guests_validator = [
     query("gender")
         .optional()
         .isString()
-        .withMessage("Gender is a string")
+        .withMessage("Gender must be string")
         .notEmpty()
         .withMessage('Gender cannot be empty')
         .isIn(['male', 'female'])
@@ -123,7 +123,7 @@ export const search_guests_validator = [
     query("name")
         .optional()
         .isString()
-        .withMessage("Name is a string")
+        .withMessage("Name must be string")
         .notEmpty()
         .withMessage("Name cannot be empty"),
     query("email")
@@ -135,13 +135,13 @@ export const search_guests_validator = [
     query("phone")
         .optional()
         .isInt()
-        .withMessage("Phone is a number")
+        .withMessage("Phone Number must be number")
         .notEmpty()
         .withMessage("Phone Number cannot be empty"),
     query('status')
         .optional()
         .isString()
-        .withMessage("Status is a string")
+        .withMessage("Status must be string")
         .notEmpty()
         .withMessage("Status cannot be empty")
         .isIn(['active', 'deleted', 'blocked'])
@@ -154,7 +154,7 @@ export const search_guests_validator = [
 export const multiple_guests_validator = [
     body()
         .isArray()
-        .withMessage("Guests must be an array"),
+        .withMessage("Guests must be array"),
     body('*.name')
         .exists()
         .withMessage("Name is required")

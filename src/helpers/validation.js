@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 import { responseHandler } from "./responseHandler";
 
 
-export const existingEmail = async (email, { req }) => {
+export const existingEmail = async (email) => {
   const check_email_existence = await Model.Guest.findOne({ where: { email } });
   if (check_email_existence) {
     throw new Error("Email already exist");
@@ -11,7 +11,7 @@ export const existingEmail = async (email, { req }) => {
   return true;
 };
 
-export const updateExistingEmail = async (email, { req }) => {
+export const verifyExistingEmail = async (email, { req }) => {
   const verify_user_existing_email = await Model.Guest.findOne({ where: { email } });
   if(verify_user_existing_email){
     if(verify_user_existing_email.id === Number(req.params.guest_id)){
@@ -39,7 +39,7 @@ export const formatPhoneNumber = async (phone) => {
   return `0${ phone?.slice(-10) }`;
 }
 
-export const updateExistingPhone = async (phone,  guest_id) => {
+export const verifyExistingPhone = async (phone,  guest_id) => {
   const verify_user_existing_phone = await Model.Guest.findOne({ where: { phone } });
   if(verify_user_existing_phone){
     if(verify_user_existing_phone.id === Number(guest_id)){
@@ -57,9 +57,9 @@ export const verifyGuest = async (body, { req }) => {
   if(!check_guest_existence){
     throw new Error("Invalid Guest");
   }
-  await updateExistingEmail(body.email, { req });
+  await verifyExistingEmail(body.email, { req });
   await acceptedPhoneNumber(body.phone);
-  await updateExistingPhone(body.phone, guest_id);
+  await verifyExistingPhone(body.phone, guest_id);
 }
 
 export const titleCase = async (name) => {

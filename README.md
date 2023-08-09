@@ -5,7 +5,6 @@ It also allow user to view guest information.
 
 # Dependencies
 - express
-- express-async-handler
 - pg
 - cors
 - dotenv
