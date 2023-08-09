@@ -245,5 +245,20 @@ export const account_creation_validator = [
         .custom(confirmPassword),
     body()
         .custom(body => checkAllowedFields(body, ['name', 'username', 'email', 'phone', 'gender', 'role', 'status', 'password', 'confirm_password']))
-    
+]
+
+export const login_validator = [
+    body("email")
+        .exists()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid Email")
+        .normalizeEmail(),
+    body("password")
+        .exists()
+        .withMessage("Password is required")
+        .notEmpty()
+        .withMessage("Password cannot be empty"),
+    body()
+        .custom(body => checkAllowedFields(body, ['email', 'password']))
 ]

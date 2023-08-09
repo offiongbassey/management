@@ -12,10 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Guest.hasMany(models.Log, {
-        foreignKey: {
-          name: 'guest_id'
-        },
+        foreignKey: 'guest_id',
         as: 'logs'
+      })
+      Guest.belongsTo(models.User, {
+        foreignKey: 'staff_id',
+        as: 'user'
       })
       
     }
@@ -25,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
     gender: DataTypes.STRING,
-    status: { type: DataTypes.ENUM('active', 'deleted', 'blocked'), defaultValue: 'active' },
+    status: { type: DataTypes.ENUM('active', 'deleted', 'blocked'), defaultValue: 'active' }
   }, {
     sequelize,
     modelName: 'Guest',

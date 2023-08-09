@@ -72,7 +72,7 @@ export const existingPhone = async (phone) => {
   const check_phone_existence = await Model.Guest.findOne({ where: { phone } });
   if (check_phone_existence) {
     throw new Error(
-      "Phone Number already exist. Please provide another one."
+      "Phone Number already exist. Provide another one."
     );
   }
   return true;

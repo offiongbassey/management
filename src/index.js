@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import Models from "./server/models";
 import router from "./routes";
+import cookieParser from "cookie-parser";
 import { responseHandler } from "./helpers/responseHandler";
 
 dotenv.config();
@@ -10,6 +11,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(cors());
 
