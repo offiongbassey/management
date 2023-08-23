@@ -48,7 +48,7 @@ export const login = async (req, res) => {
         }
         const token = generateToken(user.id);
         
-        await  client.setEx(`user_${ user.id.toString() }`, 120, token);
+        await  client.setEx(`user_${ user.id.toString() }`, 60000, token);
         
         const { id, name, username, phone, gender, status } = user;
         const user_data = { id, name, username, phone, gender, status, token };

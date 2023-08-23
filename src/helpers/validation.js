@@ -3,30 +3,27 @@ import { validationResult } from "express-validator";
 import { responseHandler } from "./responseHandler";
 import { Op } from "sequelize";
 
-export const guestValidation = async (body, { req }) =>  {
+export const guestValidation = async (body) =>  {
   await existingEmail(body.email, 'Guest');
   await acceptedPhoneNumber(body.phone);
   await existingPhone(body.phone, 'Guest');
 }
 
-export const existingEmail = async (email, type) => {
+export const existingEmail = async (email, type, id) => {
   const check_email_existence = await Model[type].findOne({ where: { email } });
+
   if (check_email_existence) {
-    throw new Error("Email already exist");
+
+    if(!id){
+      throw new Error("Email already exist.");
+    }else{
+      if(check_email_existence.id !== Number(id)){
+        throw new Error("Email already exist.");
+      }
+    }
   }
   return true;
 };
-
-export const verifyExistingEmail = async (email, { req }) => {
-  const verify_user_existing_email = await Model.Guest.findOne({ where: { email } });
-  if(verify_user_existing_email){
-    if(verify_user_existing_email.id !== Number(req.params.guest_id)){
-      throw new Error("Email already exist.");
-    }
-    
-  }
-  return true;
-}
 
 export const acceptedPhoneNumber = async (phone) => {
   const phone_type = phone.charAt(0);
@@ -44,26 +41,15 @@ export const formatPhoneNumber = async (phone) => {
   return `0${ phone?.slice(-10) }`;
 }
 
-export const verifyExistingPhone = async (phone,  guest_id) => {
-  const verify_user_existing_phone = await Model.Guest.findOne({ where: { phone } });
-  if(verify_user_existing_phone){
-    if(verify_user_existing_phone.id !== Number(guest_id)){
-      throw new Error("Phone Number already exist");
-    } 
-    
-  }
-  return true;
-}
-
 export const verifyGuest = async (body, { req }) => {
   const guest_id = req.params.guest_id;
   const check_guest_existence = await Model.Guest.findOne({ where: { id: guest_id } });
   if(!check_guest_existence){
     throw new Error("Invalid Guest");
   }
-  await verifyExistingEmail(body.email, { req });
+  await existingEmail(body.email, 'Guest', guest_id);
   await acceptedPhoneNumber(body.phone);
-  await verifyExistingPhone(body.phone, guest_id);
+  await existingPhone(body.phone, 'Guest', guest_id);
 }
 
 export const titleCase = async (name) => {
@@ -72,13 +58,19 @@ export const titleCase = async (name) => {
   }).join(' ');
 }
 
-export const existingPhone = async (phone, type) => {
+export const existingPhone = async (phone, type, id) => {
   const check_phone_existence = await Model[type].findOne({ where: { phone } });
-  if (check_phone_existence) {
-    throw new Error(
-      "Phone Number already exist. Provide another one."
-    );
+    if (check_phone_existence) {
+
+    if(!id){
+      throw new Error("Phone Number already exist. Provide another one.");
+    }else{
+      if(check_phone_existence.id !== Number(id)){
+        throw new Error("Phone Number already exist. Provide another one.");
+      } 
+    }
   }
+ 
   return true;
 };
 
