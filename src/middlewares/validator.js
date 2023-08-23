@@ -1,5 +1,5 @@
-import { body, param, query } from "express-validator";
-import { existingEmail, existingPhone, checkAllowedFields, verifyGuest, acceptedPhoneNumber, titleCase, formatPhoneNumber } from "../helpers/validation";
+import { body, param, query, header } from "express-validator";
+import { checkAllowedFields, verifyGuest, titleCase, formatPhoneNumber, verifyRole, guestValidation, accountValidation } from "../helpers/validation";
 
 export const guest_validator = [
     body('name')
@@ -14,7 +14,6 @@ export const guest_validator = [
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Email is not valid")
-        .custom(existingEmail)
         .normalizeEmail(),
     body('phone')
         .exists()
@@ -23,8 +22,6 @@ export const guest_validator = [
         .withMessage("Phone Number cannot be empty")
         .isLength({ min: 11, max: 14 })
         .withMessage("Provide a valid Phone Number")
-        .custom(acceptedPhoneNumber)
-        .custom(existingPhone)
         .trim()
         .customSanitizer(formatPhoneNumber),
     body('gender')
@@ -35,7 +32,9 @@ export const guest_validator = [
         .isIn(['male', 'female'])
         .withMessage('Gender must be male or female'),
     body()
-    .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
+        .custom(guestValidation),
+    body()
+        .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
   ]
   
   export const guest_update_validator = [
@@ -82,7 +81,8 @@ export const guest_validator = [
     param()
         .custom(param => checkAllowedFields(param, 'guest_id')),    
     body()
-        .custom(verifyGuest)
+        .custom(verifyGuest),
+    body()
         .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender'] ))
   ]
   
@@ -97,7 +97,6 @@ export const guest_validator = [
     param()
         .custom(param => checkAllowedFields(param, 'guest_id')),    
   ]
-  
   
   export const view_guest_validator = [
     param('guest_id')
