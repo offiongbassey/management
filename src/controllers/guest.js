@@ -49,7 +49,7 @@ export const updateGuest = async (req, res) => {
 export const deleteGuest = async (req, res) => {
   try {
     const id = req.params.guest_id;
-    const guest = await Model.Guest.findOne({ where: {id, status: { [Op.ne]: 'deleted' } } });
+    const guest = await Model.Guest.findOne({ where: { id, status: { [Op.ne]: 'deleted' } } });
     if (!guest) {
       return responseHandler(res, 404, false, "Guest not found");
     }

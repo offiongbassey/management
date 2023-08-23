@@ -1,5 +1,5 @@
-import { body, param, query } from "express-validator";
-import { existingEmail, existingPhone, checkAllowedFields, verifyGuest, acceptedPhoneNumber, titleCase, formatPhoneNumber } from "../helpers/validation";
+import { body, param, query, header } from "express-validator";
+import { checkAllowedFields, verifyGuest, titleCase, formatPhoneNumber, verifyRole, guestValidation, accountValidation } from "../helpers/validation";
 
 export const guest_validator = [
     body('name')
@@ -14,7 +14,6 @@ export const guest_validator = [
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Email is not valid")
-        .custom(existingEmail)
         .normalizeEmail(),
     body('phone')
         .exists()
@@ -23,8 +22,6 @@ export const guest_validator = [
         .withMessage("Phone Number cannot be empty")
         .isLength({ min: 11, max: 14 })
         .withMessage("Provide a valid Phone Number")
-        .custom(acceptedPhoneNumber)
-        .custom(existingPhone)
         .trim()
         .customSanitizer(formatPhoneNumber),
     body('gender')
@@ -35,7 +32,9 @@ export const guest_validator = [
         .isIn(['male', 'female'])
         .withMessage('Gender must be male or female'),
     body()
-    .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
+        .custom(guestValidation),
+    body()
+        .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender']))
   ]
   
   export const guest_update_validator = [
@@ -82,7 +81,8 @@ export const guest_validator = [
     param()
         .custom(param => checkAllowedFields(param, 'guest_id')),    
     body()
-        .custom(verifyGuest)
+        .custom(verifyGuest),
+    body()
         .custom(body => checkAllowedFields(body, ['name', 'email', 'phone', 'gender'] ))
   ]
   
@@ -97,7 +97,6 @@ export const guest_validator = [
     param()
         .custom(param => checkAllowedFields(param, 'guest_id')),    
   ]
-  
   
   export const view_guest_validator = [
     param('guest_id')
@@ -151,4 +150,156 @@ export const guest_validator = [
   
   ]
 
-  
+export const account_creation_validator = [
+    body('name')
+        .exists()
+        .withMessage("Name is required")
+        .notEmpty()
+        .withMessage("Name cannot be empty")
+        .trim()
+        .customSanitizer(titleCase),
+    body('username')
+        .optional(),
+    body('email')
+        .exists()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Email is not valid")
+        .normalizeEmail(),
+    body('phone')
+        .exists()
+        .withMessage("Phone Number is required")
+        .notEmpty()
+        .withMessage("Phone Number cannot be empty")
+        .isLength({ min: 11, max:14 })
+        .withMessage("Provide a valid Phone Number")
+        .trim()
+        .customSanitizer(formatPhoneNumber),
+    body("gender")
+        .exists()
+        .withMessage("Gender is required")
+        .notEmpty()
+        .withMessage("Gender cannot be empty")
+        .isIn(['male', 'female'])
+        .withMessage("Gender must be male or female"),
+    body("password")
+        .exists()
+        .withMessage("Password is required")
+        .isLength({ min: 7 })
+        .withMessage("Password must not be less than 7 digits"),
+    body("confirm_password")
+        .exists()
+        .withMessage("Confirm Password cannot be empty")
+        .isLength({ min: 7 })
+        .withMessage("Confirm Password must not be less than 7 digits"),
+    body()
+        .custom(accountValidation),
+    body()
+        .custom(body => checkAllowedFields(body, ['name', 'username', 'email', 'phone', 'gender', 'role', 'status', 'password', 'confirm_password']))
+]
+
+export const login_validator = [
+    body("email")
+        .exists()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid Email")
+        .normalizeEmail(),
+    body("password")
+        .exists()
+        .withMessage("Password is required")
+        .notEmpty()
+        .withMessage("Password cannot be empty"),
+    body()
+        .custom(body => checkAllowedFields(body, ['email', 'password']))
+]
+
+export const create_role_validator = [
+    body('name')
+        .exists()
+        .withMessage("Role Name is required")
+        .notEmpty()
+        .withMessage("Role cannot be empty")
+        .trim(),
+    body()
+        .custom(body => checkAllowedFields(body, ['name']))
+]
+
+export const assign_role_validator = [
+    param('user_id')
+        .exists()
+        .withMessage("User Id is required")
+        .notEmpty()
+        .withMessage("User Id cannot be empty")
+        .isInt()
+        .withMessage("User Id must be a number"),
+    body('role_id')
+        .exists()
+        .withMessage("Role Id is required")
+        .notEmpty()
+        .withMessage("Role Id cannot be empty")
+        .isInt()
+        .withMessage("Role Id must be a number"),
+    param()
+        .custom(param => checkAllowedFields(param, ['user_id'])),
+    body()
+        .custom(body => checkAllowedFields(body, ['role_id']))
+    
+]
+
+export const logout_validator = [
+    header('token')
+        .exists()
+        .withMessage("Header is required")
+        .notEmpty()
+        .withMessage("Token cannot be empty")
+        .isString()
+        .withMessage("Token must be a string")
+]
+
+export const update_role_validator = [
+    param('role_id')
+        .exists()
+        .withMessage("Role Id is required")
+        .notEmpty()
+        .withMessage("Role Id cannot be empty")
+        .isInt()
+        .withMessage("Role Id must be a number")
+        .custom(verifyRole),
+    body('name')
+        .exists()
+        .withMessage("Role Name is required")
+        .notEmpty()
+        .withMessage("Role Name cannot be empty")
+        .trim(),
+    param()
+        .custom(param => checkAllowedFields(param, ['role_id'])),
+    body()
+        .custom(body => checkAllowedFields(body, ['name']))
+]
+
+export const change_role_status_validator = [
+    param('role_id')
+        .exists()
+        .withMessage("Role Id is Required")
+        .notEmpty()
+        .withMessage("Role Id cannot be empty")
+        .isInt()
+        .withMessage("Role Id must be a number")
+        .custom(verifyRole),
+    param()
+        .custom(param => checkAllowedFields(param, ['role_id']))
+]
+
+export const delete_role_validator = [
+    param('role_id')
+        .exists()
+        .withMessage("Role Id is Required")
+        .notEmpty()
+        .withMessage("Role Id cannot be empty")
+        .isInt()
+        .withMessage("Role Id must be a number")
+        .custom(verifyRole),
+    param()
+        .custom(param => checkAllowedFields(param, ['role_id']))
+]
