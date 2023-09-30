@@ -11,21 +11,18 @@ export const createUser = async (req, res) => {
     try {
         const { name, username, email, phone, gender, password } = req.body;
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        let userName;
+        const hashedPassword = await bcrypt.hash(password, salt); 
         //generating unique username
-        if(username === ""){
-            userName = await generateUsername(name);
-        }
-        
+        const user_name = username ? username : await generateUsername(name);
+       
         const user = await Model.User.create({
             name,
-            username: username !== "" ? username : userName,
+            username: username !== "" ? username : user_name,
             email,
             phone,
             gender, 
             'status': 'active',
-            password: hashedPassword,
+            password: hashedPassword
         });
 
         return responseHandler(res, 201, true, "Account Successfully Created.", user);
