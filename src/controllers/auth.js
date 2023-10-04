@@ -11,7 +11,7 @@ export const createUser = async (req, res) => {
     try {
         const { name, username, email, phone, gender, password } = req.body;
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt); 
+        const hashed_password = await bcrypt.hash(password, salt); 
         //generating unique username
         const user_name = username ? username : await generateUsername(name);
        
@@ -22,7 +22,7 @@ export const createUser = async (req, res) => {
             phone,
             gender, 
             'status': 'active',
-            password: hashedPassword
+            password: hashed_password
         });
 
         return responseHandler(res, 201, true, "Account Successfully Created.", user);
