@@ -17,7 +17,7 @@ export const createUser = async (req, res) => {
        
         const user = await Model.User.create({
             name,
-            username: username !== "" ? username : user_name,
+            username: user_name,
             email,
             phone,
             gender, 
@@ -39,8 +39,8 @@ export const login = async (req, res) => {
         if(!user){
             return responseHandler(res, 404, false, "User not found");
         }
-        const verifyPassword = await bcrypt.compare(password, user.password);
-        if(!verifyPassword){
+        const verify_password = await bcrypt.compare(password, user.password);
+        if(!verify_password){
             return responseHandler(res, 400, false, "Invalid Email or Password");
         }
         const token = generateToken(user.id);
